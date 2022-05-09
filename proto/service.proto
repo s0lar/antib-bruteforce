@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package antibruteforce;
+
+option go_package = "./antibruteforce";
+
+//
+message CheckRequest {
+  string login = 1;
+  string password = 2;
+  string ip = 3;
+}
+
+//
+message CheckResponse {
+  bool result = 1;
+}
+
+
+service Checker {
+  rpc Check(CheckRequest) returns (CheckResponse) {}
+}
