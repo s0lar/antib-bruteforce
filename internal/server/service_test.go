@@ -2,12 +2,12 @@ package server
 
 import (
 	"context"
-	"github.com/s0lar/antib-bruteforce/internal/netlist"
 	"testing"
 	"time"
 
 	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/s0lar/antib-bruteforce/internal/bucket"
+	"github.com/s0lar/antib-bruteforce/internal/netlist"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,11 +18,8 @@ func TestServer_Check(t *testing.T) {
 	ttl := interval * 2
 	testsCount := 11
 
-	// srv := NewServer(
-	//	server.NewBucket("login", limit, interval, ttl),
-	//	server.NewBucket("password", limit, interval, ttl),
-	//	server.NewBucket("ip", limit, interval, ttl),
-	//)
+	netList := netlist.NewNetList()
+	netList.Add("192.168.0.0/16")
 
 	tests := []struct {
 		name    string
@@ -78,6 +75,30 @@ func TestServer_Check(t *testing.T) {
 			0,
 			testsCount,
 		},
+		{
+			"White list",
+			NewServer(
+				bucket.NewBucket("login", 0, interval, ttl),
+				bucket.NewBucket("password", 0, interval, ttl),
+				bucket.NewBucket("ip", 0, interval, ttl),
+				netList,
+				netlist.NewNetList(),
+			),
+			testsCount,
+			0,
+		},
+		{
+			"Black list",
+			NewServer(
+				bucket.NewBucket("login", 0, interval, ttl),
+				bucket.NewBucket("password", 0, interval, ttl),
+				bucket.NewBucket("ip", 0, interval, ttl),
+				netlist.NewNetList(),
+				netList,
+			),
+			0,
+			testsCount,
+		},
 	}
 
 	for _, tt := range tests {
@@ -102,45 +123,73 @@ func TestServer_Check(t *testing.T) {
 			require.Equal(t, tt.okFalse, okFalse)
 		})
 	}
+}
 
-	//
-	// type fields struct {
-	//	UnimplementedCheckerServer antibruteforce.UnimplementedCheckerServer
-	//	bucketLogin                *server.Bucket
-	//	bucketPassword             *server.Bucket
-	//	bucketIP                   *server.Bucket
-	//	logger                     log.Logger
-	//}
-	// type args struct {
-	//	ctx context.Context
-	//	req *pb.CheckRequest
-	//}
-	// tests := []struct {
-	//	name    string
-	//	fields  fields
-	//	args    args
-	//	want    *pb.CheckResponse
-	//	wantErr bool
-	// }{
-	//	// TODO: Add test cases.
-	//}
-	// for _, tt := range tests {
-	//	t.Run(tt.name, func(t *testing.T) {
-	//		s := &Server{
-	//			UnimplementedCheckerServer: tt.fields.UnimplementedCheckerServer,
-	//			bucketLogin:                tt.fields.bucketLogin,
-	//			bucketPassword:             tt.fields.bucketPassword,
-	//			bucketIP:                   tt.fields.bucketIP,
-	//			logger:                     tt.fields.logger,
-	//		}
-	//		got, err := s.Check(tt.args.ctx, tt.args.req)
-	//		if (err != nil) != tt.wantErr {
-	//			t.Errorf("Check() error = %v, wantErr %v", err, tt.wantErr)
-	//			return
-	//		}
-	//		if !reflect.DeepEqual(got, tt.want) {
-	//			t.Errorf("Check() got = %v, want %v", got, tt.want)
-	//		}
-	//	})
-	//}
+func TestServer_Reset(t *testing.T) {
+	var ctx context.Context
+	limit := 10
+	interval := 1 * time.Minute
+	ttl := interval * 2
+
+	server := NewServer(
+		bucket.NewBucket("login", limit, interval, ttl),
+		bucket.NewBucket("password", limit, interval, ttl),
+		bucket.NewBucket("ip", limit, interval, ttl),
+		netlist.NewNetList(),
+		netlist.NewNetList(),
+	)
+
+	tests := []struct {
+		name     string
+		login    string
+		password string
+		server   *Server
+		isOk     bool
+		isErr    bool
+		err      error
+	}{
+		{
+			"Reset login bucket",
+			"login",
+			"password",
+			server,
+			true,
+			false,
+			nil,
+		},
+		{
+			"Reset login bucket",
+			"",
+			"password",
+			server,
+			false,
+			true,
+			ErrorValidateEmptyLogin,
+		},
+		{
+			"Reset login bucket",
+			"login",
+			"",
+			server,
+			false,
+			true,
+			ErrorValidateEmptyPassword,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res, err := tt.server.Reset(ctx, &pb.ResetRequest{
+				Login:    tt.login,
+				Password: tt.password,
+			})
+
+			require.Equal(t, tt.isOk, res.GetOk())
+
+			if err != nil {
+				require.True(t, tt.isErr)
+				require.ErrorIs(t, err, tt.err)
+			}
+		})
+	}
 }

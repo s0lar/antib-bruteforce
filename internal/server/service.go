@@ -3,17 +3,18 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/s0lar/antib-bruteforce/internal/netlist"
 	"log"
 
 	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/s0lar/antib-bruteforce/internal/bucket"
+	"github.com/s0lar/antib-bruteforce/internal/netlist"
 )
 
-var ValidateEmptyIPError = errors.New("validate error: empty IP")
-var ValidateWrongIPError = errors.New("validate error: wrong IP")
-var ValidateEmptyLoginError = errors.New("validate error: empty Login")
-var ValidateEmptyPasswordError = errors.New("validate error: empty Password")
+var (
+	ErrorValidateEmptyIP       = errors.New("validate error: empty IP")
+	ErrorValidateEmptyLogin    = errors.New("validate error: empty Login")
+	ErrorValidateEmptyPassword = errors.New("validate error: empty Password")
+)
 
 type Server struct {
 	pb.UnimplementedCheckerServer
@@ -39,26 +40,31 @@ func NewServer(bucketLogin, bucketPassword, bucketIP *bucket.Bucket, listWhite, 
 func (s *Server) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResponse, error) {
 	log.Printf("Check: Request (%s)\n", req)
 
-	//	TODO. Validate
 	if req.GetIp() == "" {
-		log.Printf("Ok: false. %v", ValidateEmptyIPError)
-		return &pb.CheckResponse{Ok: false}, ValidateEmptyIPError
+		log.Printf("Ok: false. %v", ErrorValidateEmptyIP)
+		return &pb.CheckResponse{Ok: false}, ErrorValidateEmptyIP
 	}
 
 	if req.GetLogin() == "" {
-		log.Printf("Ok: false. %v", ValidateEmptyLoginError)
-		return &pb.CheckResponse{Ok: false}, ValidateEmptyLoginError
+		log.Printf("Ok: false. %v", ErrorValidateEmptyLogin)
+		return &pb.CheckResponse{Ok: false}, ErrorValidateEmptyLogin
 	}
 
 	if req.GetPassword() == "" {
-		log.Printf("Ok: false. %v", ValidateEmptyPasswordError)
-		return &pb.CheckResponse{Ok: false}, ValidateEmptyPasswordError
+		log.Printf("Ok: false. %v", ErrorValidateEmptyPassword)
+		return &pb.CheckResponse{Ok: false}, ErrorValidateEmptyPassword
 	}
 
-	//	TODO. Check IP
+	//	Check IP in WhiteList. If found then return Ok:true
+	if s.listWhite.Find(req.GetIp()) {
+		log.Printf("Ok: true. IP found in white list %s\n", req.GetIp())
+		return &pb.CheckResponse{Ok: true}, nil
+	}
 
-	if req.GetIp() != "" && s.listWhite.Find(req.GetIp()) {
-
+	//	Check IP in BlackList. If found then return Ok:false
+	if s.listBlack.Find(req.GetIp()) {
+		log.Printf("Ok: false. IP found in black list %s\n", req.GetIp())
+		return &pb.CheckResponse{Ok: false}, nil
 	}
 
 	if !s.bucketLogin.Allow(req.GetLogin()) {
@@ -82,13 +88,13 @@ func (s *Server) Reset(ctx context.Context, req *pb.ResetRequest) (*pb.ResetResp
 	log.Printf("Reset: Request (%s)\n", req)
 
 	if req.GetLogin() == "" {
-		log.Printf("Ok: false. Empty login")
-		return &pb.ResetResponse{Ok: true}, nil
+		log.Printf("Ok: false. %v", ErrorValidateEmptyLogin)
+		return &pb.ResetResponse{Ok: false}, ErrorValidateEmptyLogin
 	}
 
 	if req.GetPassword() == "" {
-		log.Printf("Ok: false. Empty password")
-		return &pb.ResetResponse{Ok: true}, nil
+		log.Printf("Ok: false. %v", ErrorValidateEmptyPassword)
+		return &pb.ResetResponse{Ok: false}, ErrorValidateEmptyPassword
 	}
 
 	s.bucketLogin.Reset(req.GetLogin())

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/s0lar/antib-bruteforce/internal/netlist"
 	"log"
 	"net"
 	"time"
 
 	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/s0lar/antib-bruteforce/internal/bucket"
+	"github.com/s0lar/antib-bruteforce/internal/netlist"
 	"github.com/s0lar/antib-bruteforce/internal/server"
 	"google.golang.org/grpc"
 )
