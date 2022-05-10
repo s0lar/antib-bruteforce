@@ -11,7 +11,7 @@ echo:
 
 .PHONY: test
 test:
-	go test -p 1 -v -race ./...
+	go test -v -race -count 100 ./...
 
 .PHONY: test-coverage
 test-coverage:
