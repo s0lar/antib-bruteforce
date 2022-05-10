@@ -29,7 +29,7 @@ lint:
 .PHONY: protoc
 protoc:
 	mkdir -p ./gen
-	protoc --proto_path=. --go_out=plugins=grpc:./gen ./proto/service.proto
+	protoc --proto_path=. --go_out=./gen --go-grpc_out=./gen ./proto/service.proto
 
 .PHONY: build-server
 build-server:

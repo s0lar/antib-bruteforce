@@ -1,0 +1,193 @@
+// !codeanalysis
+//package main
+//
+////
+//// import (
+////	"fmt"
+////	"time"
+////
+////	"go.uber.org/ratelimit"
+////)
+////
+//// func main() {
+////	rl := ratelimit.New(1) // per second
+////
+////	prev := time.Now()
+////	for i := 0; i < 100; i++ {
+////		rl.
+////		now := rl.Take()
+////		fmt.Println(i, now.Sub(prev))
+////		prev = now
+////	}
+////
+////	// Output:
+////	// 0 0
+////	// 1 10ms
+////	// 2 10ms
+////	// 3 10ms
+////	// 4 10ms
+////	// 5 10ms
+////	// 6 10ms
+////	// 7 10ms
+////	// 8 10ms
+////	// 9 10ms
+////}
+//
+//// import (
+////	"context"
+////	"fmt"
+////	"time"
+////
+////	"golang.org/x/time/rate"
+////)
+////
+//// func main() {
+////	limit := 1
+////	burst := 100
+////	limiter := rate.NewLimiter(rate.Limit(limit), burst)
+////	ctx := context.Background()
+////	i := 0
+////	for {
+////		fmt.Println("Do smth...", time.Now())
+////		limiter.Wait(ctx)
+////		fmt.Println(i, " - ", time.Now())
+////		i++
+////	}
+////}
+//
+//// import (
+////	"fmt"
+////	"time"
+////
+////	"github.com/beefsack/go-rate"
+////)
+////
+//// var rl = rate.New(3, time.Second) // 3 times per second
+////
+//// func say(message string) {
+////	if ok, remaining := rl.Try(); ok {
+////		fmt.Printf("You said: %s\n", message)
+////	} else {
+////		fmt.Printf("Spam filter triggered, please wait %s\n", remaining)
+////	}
+////}
+////
+//// func main() {
+////	for i := 1; i <= 5; i++ {
+////		say(fmt.Sprintf("Message %d", i))
+////	}
+////	time.Sleep(time.Second / 2)
+////	say("I waited half a second, is that enough?")
+////	time.Sleep(time.Second / 2)
+////	say("Okay, I waited a second.")
+////	// Output:
+////	// You said: Message 1
+////	// You said: Message 2
+////	// You said: Message 3
+////	// Spam filter triggered, please wait 999.980816ms
+////	// Spam filter triggered, please wait 999.976704ms
+////	// Spam filter triggered, please wait 499.844795ms
+////	// You said: Okay, I waited a second.
+////}
+//
+//// import (
+////	"fmt"
+////	"time"
+////
+////	"github.com/beefsack/go-rate"
+////)
+////
+//// var rl = rate.New(10, time.Second) // 3 times per second
+////
+//// func say(message string) {
+////	if ok, remaining := rl.Try(); ok {
+////		fmt.Printf("You said: %s\n", message)
+////	} else {
+////		fmt.Printf("Spam filter triggered, please wait %s\n", remaining)
+////	}
+////}
+////
+//// func main() {
+////	for i := 1; i <= 15; i++ {
+////		say(fmt.Sprintf("Message %d", i))
+////	}
+////	time.Sleep(time.Second / 2)
+////	say("I waited half a second, is that enough?")
+////	time.Sleep(time.Second / 2)
+////	say("Okay, I waited a second.")
+////	// Output:
+////	// You said: Message 1
+////	// You said: Message 2
+////	// You said: Message 3
+////	// Spam filter triggered, please wait 999.980816ms
+////	// Spam filter triggered, please wait 999.976704ms
+////	// Spam filter triggered, please wait 499.844795ms
+////	// You said: Okay, I waited a second.
+////}
+//
+//import (
+//	"context"
+//	"fmt"
+//	"time"
+//
+//	"golang.org/x/time/rate"
+//)
+//
+//func main() {
+//	limit := 3
+//	burst := 3
+//	limiter := rate.NewLimiter(rate.Limit(limit), burst)
+//	ctx := context.Background()
+//
+//	if err := limiter.Wait(ctx); err != nil {
+//		_ = fmt.Errorf("err %v", err)
+//	}
+//	fmt.Println("Allow", limiter.Allow())
+//
+//	if err := limiter.Wait(ctx); err != nil {
+//		_ = fmt.Errorf("err %v", err)
+//	}
+//	fmt.Println("Allow", limiter.Allow())
+//
+//	if err := limiter.Wait(ctx); err != nil {
+//		_ = fmt.Errorf("err %v", err)
+//	}
+//	fmt.Println("Allow", limiter.Allow())
+//
+//	return
+//
+//	// i := 0
+//	// for {
+//	//	fmt.Println(i, "Allow", limiter.Allow())
+//	//	limiter.Wait(ctx)
+//	//	//fmt.Println(i, " - ", time.Now())
+//	//	i++
+//	//	if i%10 == 0 {
+//	//		time.Sleep(3 * time.Second)
+//	//	}
+//	//}
+//
+//	for i := 1; i < 3; i++ {
+//		go gor(fmt.Sprintf("gor %v", i))
+//	}
+//
+//	time.Sleep(5 * time.Second)
+//}
+//
+//func gor(name string) {
+//	limit := 3
+//	burst := 3
+//	limiter := rate.NewLimiter(rate.Limit(limit), burst)
+//	ctx := context.Background()
+//	i := 0
+//	for {
+//		fmt.Println(name, " - ", i, "Allow", limiter.Allow())
+//		limiter.Wait(ctx)
+//
+//		i++
+//		if i%3 == 0 {
+//			fmt.Println("ctx.Done")
+//			ctx.Done()
+//		}
+//	}
+//}
