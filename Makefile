@@ -34,11 +34,3 @@ protoc:
 .PHONY: build-server
 build-server:
 	$(GO_BUILD) -o ./bin/server ./cmd/server
-
-.PHONY: build-mars-consumer
-build-mars-consumer:
-	$(GO_BUILD) -o ./bin/mars_consumer ./cmd/mars_consumer
-
-.PHONY: build-wtis-consumer
-build-wtis-consumer:
-	$(GO_BUILD) -o ./bin/wtis_consumer ./cmd/wtis_consumer
