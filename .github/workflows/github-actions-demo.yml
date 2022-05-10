@@ -1,22 +1,3 @@
-#name: GitHub Actions Demo
-#on: [push]
-#jobs:
-#  Explore-GitHub-Actions:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-#      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-#      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-#      - name: Check out repository code
-#        uses: actions/checkout@v3
-#      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-#      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-#      - name: List files in the repository
-#        run: |
-#          ls ${{ github.workspace }}
-#      - run: echo "🍏 This job's status is ${{ job.status }}."
-
-
 name: Otus homework tests
 
 on: [push]
@@ -27,7 +8,6 @@ env:
 jobs:
   go_get:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'calendar') }}
     steps:
       - name: Extract branch name
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
@@ -39,7 +19,6 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'calendar') }}
     steps:
       - name: Extract branch name
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
@@ -55,7 +34,6 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'calendar') }}
     steps:
       - name: Extract branch name
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
@@ -77,32 +55,31 @@ jobs:
         if: env.BRANCH == 'hw10_program_optimization'
         working-directory: ${{ env.BRANCH }}
 
-      - name: Bash tests
-        shell: bash
-        run: ./test.sh
-        if: contains('hw01_hello_otus hw07_file_copying hw08_envdir_tool hw11_telnet_client', env.BRANCH)
-        working-directory: ${{ env.BRANCH }}
-
-  tests_by_makefile:
-    runs-on: ubuntu-latest
-    if: contains(github.ref, 'calendar')
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.16
-
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: make lint
-        run: make lint
-        working-directory: hw12_13_14_15_calendar
-
-      - name: make build
-        run: make build
-        working-directory: hw12_13_14_15_calendar
-
-      - name: make test
-        run: make test
-        working-directory: hw12_13_14_15_calendar
+#      - name: Bash tests
+#        shell: bash
+#        run: ./test.sh
+#        if: contains('hw01_hello_otus hw07_file_copying hw08_envdir_tool hw11_telnet_client', env.BRANCH)
+#        working-directory: ${{ env.BRANCH }}
+#  tests_by_makefile:
+#    runs-on: ubuntu-latest
+#    if: contains(github.ref, 'calendar')
+#    steps:
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ^1.16
+#
+#      - name: Check out code
+#        uses: actions/checkout@v2
+#
+#      - name: make lint
+#        run: make lint
+#        working-directory: hw12_13_14_15_calendar
+#
+#      - name: make build
+#        run: make build
+#        working-directory: hw12_13_14_15_calendar
+#
+#      - name: make test
+#        run: make test
+#        working-directory: hw12_13_14_15_calendar
