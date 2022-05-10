@@ -11,6 +11,41 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var netListTests = []struct {
+	net    string
+	isOk   bool
+	isErr  bool
+	errMsg string
+}{
+	{
+		"172.17.0.0/16",
+
+		true,
+		false,
+		"",
+	},
+	{
+		"0.0.0.0",
+
+		false,
+		true,
+		"invalid CIDR address: 0.0.0.0",
+	},
+	{
+		"password",
+
+		false,
+		true,
+		"invalid CIDR address: password",
+	},
+	{
+		"",
+		false,
+		true,
+		"validate error: empty net",
+	},
+}
+
 func TestServer_Check(t *testing.T) {
 	var ctx context.Context
 	limit := 10
@@ -30,9 +65,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"Check login bucket",
 			NewServer(
-				bucket.NewBucket("login", limit, interval, ttl),
-				bucket.NewBucket("password", testsCount+1, interval, ttl),
-				bucket.NewBucket("ip", testsCount+1, interval, ttl),
+				bucket.NewBucket(limit, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
 				netlist.NewNetList(),
 				netlist.NewNetList(),
 			),
@@ -42,9 +77,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"Check password bucket",
 			NewServer(
-				bucket.NewBucket("login", testsCount+1, interval, ttl),
-				bucket.NewBucket("password", limit, interval, ttl),
-				bucket.NewBucket("ip", testsCount+1, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
+				bucket.NewBucket(limit, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
 				netlist.NewNetList(),
 				netlist.NewNetList(),
 			),
@@ -54,9 +89,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"Check ip bucket",
 			NewServer(
-				bucket.NewBucket("login", testsCount+1, interval, ttl),
-				bucket.NewBucket("password", testsCount+1, interval, ttl),
-				bucket.NewBucket("ip", limit, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
+				bucket.NewBucket(testsCount+1, interval, ttl),
+				bucket.NewBucket(limit, interval, ttl),
 				netlist.NewNetList(),
 				netlist.NewNetList(),
 			),
@@ -66,9 +101,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"Zero limit",
 			NewServer(
-				bucket.NewBucket("login", 0, interval, ttl),
-				bucket.NewBucket("password", 0, interval, ttl),
-				bucket.NewBucket("ip", 0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
 				netlist.NewNetList(),
 				netlist.NewNetList(),
 			),
@@ -78,9 +113,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"White list",
 			NewServer(
-				bucket.NewBucket("login", 0, interval, ttl),
-				bucket.NewBucket("password", 0, interval, ttl),
-				bucket.NewBucket("ip", 0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
 				netList,
 				netlist.NewNetList(),
 			),
@@ -90,9 +125,9 @@ func TestServer_Check(t *testing.T) {
 		{
 			"Black list",
 			NewServer(
-				bucket.NewBucket("login", 0, interval, ttl),
-				bucket.NewBucket("password", 0, interval, ttl),
-				bucket.NewBucket("ip", 0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
+				bucket.NewBucket(0, interval, ttl),
 				netlist.NewNetList(),
 				netList,
 			),
@@ -127,14 +162,10 @@ func TestServer_Check(t *testing.T) {
 
 func TestServer_Reset(t *testing.T) {
 	var ctx context.Context
-	limit := 10
-	interval := 1 * time.Minute
-	ttl := interval * 2
-
 	server := NewServer(
-		bucket.NewBucket("login", limit, interval, ttl),
-		bucket.NewBucket("password", limit, interval, ttl),
-		bucket.NewBucket("ip", limit, interval, ttl),
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
 		netlist.NewNetList(),
 		netlist.NewNetList(),
 	)
@@ -143,7 +174,6 @@ func TestServer_Reset(t *testing.T) {
 		name     string
 		login    string
 		password string
-		server   *Server
 		isOk     bool
 		isErr    bool
 		err      error
@@ -152,7 +182,6 @@ func TestServer_Reset(t *testing.T) {
 			"Reset login bucket",
 			"login",
 			"password",
-			server,
 			true,
 			false,
 			nil,
@@ -161,7 +190,6 @@ func TestServer_Reset(t *testing.T) {
 			"Reset login bucket",
 			"",
 			"password",
-			server,
 			false,
 			true,
 			ErrorValidateEmptyLogin,
@@ -170,7 +198,6 @@ func TestServer_Reset(t *testing.T) {
 			"Reset login bucket",
 			"login",
 			"",
-			server,
 			false,
 			true,
 			ErrorValidateEmptyPassword,
@@ -179,7 +206,7 @@ func TestServer_Reset(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			res, err := tt.server.Reset(ctx, &pb.ResetRequest{
+			res, err := server.Reset(ctx, &pb.ResetRequest{
 				Login:    tt.login,
 				Password: tt.password,
 			})
@@ -192,4 +219,77 @@ func TestServer_Reset(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestServer_AddWhitelist(t *testing.T) {
+	ctx, server := prepareCtxServer()
+
+	for _, tt := range netListTests {
+		t.Run(tt.net, func(t *testing.T) {
+			res, err := server.AddWhitelist(ctx, &pb.NetListRequest{Net: tt.net})
+			require.Equal(t, tt.isOk, res.GetOk())
+			if err != nil {
+				require.True(t, tt.isErr)
+				require.Equal(t, tt.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func TestServer_AddBlacklist(t *testing.T) {
+	ctx, server := prepareCtxServer()
+
+	for _, tt := range netListTests {
+		t.Run(tt.net, func(t *testing.T) {
+			res, err := server.AddBlacklist(ctx, &pb.NetListRequest{Net: tt.net})
+			require.Equal(t, tt.isOk, res.GetOk())
+			if err != nil {
+				require.True(t, tt.isErr)
+				require.Equal(t, tt.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func TestServer_RemoveWhitelist(t *testing.T) {
+	ctx, server := prepareCtxServer()
+
+	for _, tt := range netListTests {
+		t.Run(tt.net, func(t *testing.T) {
+			res, err := server.RemoveWhitelist(ctx, &pb.NetListRequest{Net: tt.net})
+			require.Equal(t, tt.isOk, res.GetOk())
+			if err != nil {
+				require.True(t, tt.isErr)
+				require.Equal(t, tt.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func TestServer_RemoveBlacklist(t *testing.T) {
+	ctx, server := prepareCtxServer()
+
+	for _, tt := range netListTests {
+		t.Run(tt.net, func(t *testing.T) {
+			res, err := server.RemoveBlacklist(ctx, &pb.NetListRequest{Net: tt.net})
+			require.Equal(t, tt.isOk, res.GetOk())
+			if err != nil {
+				require.True(t, tt.isErr)
+				require.Equal(t, tt.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func prepareCtxServer() (context.Context, *Server) {
+	var ctx context.Context
+	server := NewServer(
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
+		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
+		netlist.NewNetList(),
+		netlist.NewNetList(),
+	)
+
+	return ctx, server
 }

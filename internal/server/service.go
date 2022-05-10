@@ -14,6 +14,7 @@ var (
 	ErrorValidateEmptyIP       = errors.New("validate error: empty IP")
 	ErrorValidateEmptyLogin    = errors.New("validate error: empty Login")
 	ErrorValidateEmptyPassword = errors.New("validate error: empty Password")
+	ErrorValidateEmptyNet      = errors.New("validate error: empty net")
 )
 
 type Server struct {
@@ -102,6 +103,62 @@ func (s *Server) Reset(ctx context.Context, req *pb.ResetRequest) (*pb.ResetResp
 
 	log.Printf("Ok: true\n")
 	return &pb.ResetResponse{Ok: true}, nil
+}
+
+func (s *Server) AddWhitelist(ctx context.Context, req *pb.NetListRequest) (*pb.NetListResponse, error) {
+	if req.GetNet() == "" {
+		log.Printf("Ok: false. %v", ErrorValidateEmptyNet)
+		return &pb.NetListResponse{Ok: false}, ErrorValidateEmptyNet
+	}
+
+	if err := s.listWhite.Add(req.GetNet()); err != nil {
+		log.Printf("Ok: false. %v", err)
+		return &pb.NetListResponse{Ok: false}, err
+	}
+
+	return &pb.NetListResponse{Ok: true}, nil
+}
+
+func (s *Server) RemoveWhitelist(ctx context.Context, req *pb.NetListRequest) (*pb.NetListResponse, error) {
+	if req.GetNet() == "" {
+		log.Printf("Ok: false. %v", ErrorValidateEmptyNet)
+		return &pb.NetListResponse{Ok: false}, ErrorValidateEmptyNet
+	}
+
+	if err := s.listWhite.Remove(req.GetNet()); err != nil {
+		log.Printf("Ok: false. %v", err)
+		return &pb.NetListResponse{Ok: false}, err
+	}
+
+	return &pb.NetListResponse{Ok: true}, nil
+}
+
+func (s *Server) AddBlacklist(ctx context.Context, req *pb.NetListRequest) (*pb.NetListResponse, error) {
+	if req.GetNet() == "" {
+		log.Printf("Ok: false. %v", ErrorValidateEmptyNet)
+		return &pb.NetListResponse{Ok: false}, ErrorValidateEmptyNet
+	}
+
+	if err := s.listBlack.Add(req.GetNet()); err != nil {
+		log.Printf("Ok: false. %v", err)
+		return &pb.NetListResponse{Ok: false}, err
+	}
+
+	return &pb.NetListResponse{Ok: true}, nil
+}
+
+func (s *Server) RemoveBlacklist(ctx context.Context, req *pb.NetListRequest) (*pb.NetListResponse, error) {
+	if req.GetNet() == "" {
+		log.Printf("Ok: false. %v", ErrorValidateEmptyNet)
+		return &pb.NetListResponse{Ok: false}, ErrorValidateEmptyNet
+	}
+
+	if err := s.listBlack.Remove(req.GetNet()); err != nil {
+		log.Printf("Ok: false. %v", err)
+		return &pb.NetListResponse{Ok: false}, err
+	}
+
+	return &pb.NetListResponse{Ok: true}, nil
 }
 
 func (s *Server) mustEmbedUnimplementedCheckerServer() {

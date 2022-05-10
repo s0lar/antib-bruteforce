@@ -10,7 +10,7 @@ import (
 func TestBucket_Allow(t *testing.T) {
 	interval := 2 * time.Millisecond
 	ttl := interval * 2
-	bucket := NewBucket("login", 2, interval, ttl)
+	bucket := NewBucket(2, interval, ttl)
 
 	require.True(t, bucket.Allow("test"))
 	require.True(t, bucket.Allow("test"))
@@ -28,7 +28,7 @@ func TestBucket_Allow(t *testing.T) {
 func TestBucket_Reset(t *testing.T) {
 	interval := 2 * time.Millisecond
 	ttl := interval * 2
-	bucket := NewBucket("login", 2, interval, ttl)
+	bucket := NewBucket(2, interval, ttl)
 
 	require.True(t, bucket.Allow("test"))
 	require.True(t, bucket.Allow("test"))
@@ -51,7 +51,7 @@ func TestBucket_BucketGC(t *testing.T) {
 	interval := 5 * time.Minute
 	ttl := 1 * time.Millisecond
 	sleep := 2 * time.Millisecond
-	bucket := NewBucket("login", 1, interval, ttl)
+	bucket := NewBucket(1, interval, ttl)
 
 	//	Clear bucket for key
 	require.True(t, bucket.Allow("test"))

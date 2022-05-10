@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net"
-	"time"
 
 	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/s0lar/antib-bruteforce/internal/bucket"
@@ -13,13 +12,20 @@ import (
 )
 
 func main() {
-	lsn, err := net.Listen("tcp", "localhost:50051")
+	//	TODO Config
+	cfg, err := NewConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	interval := 1000 * time.Second
-	ttl := interval * 2
+	//	TODO DB
+	//	TODO CLI
+	//	TODO Docker && Make
+
+	lsn, err := net.Listen("tcp", cfg.App.ServerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	listWhite := netlist.NewNetList()
 	listBlack := netlist.NewNetList()
@@ -33,9 +39,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	srv := server.NewServer(
-		bucket.NewBucket("login", 10, interval, ttl),
-		bucket.NewBucket("password", 1000, interval, ttl),
-		bucket.NewBucket("ip", 1000, interval, ttl),
+		bucket.NewBucket(cfg.App.Login.limit, cfg.App.Login.interval, cfg.App.Login.ttl),          //	Login
+		bucket.NewBucket(cfg.App.Password.limit, cfg.App.Password.interval, cfg.App.Password.ttl), //	Password
+		bucket.NewBucket(cfg.App.IP.limit, cfg.App.IP.interval, cfg.App.IP.ttl),                   //	IP
 		listWhite,
 		listBlack,
 	)

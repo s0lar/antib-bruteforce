@@ -14,7 +14,6 @@ type Counter struct {
 
 // Bucket - store map of Counter's.
 type Bucket struct {
-	prefix   string
 	limit    int
 	interval time.Duration
 	ttl      time.Duration
@@ -22,9 +21,8 @@ type Bucket struct {
 	mx       sync.Mutex
 }
 
-func NewBucket(prefix string, limit int, interval, ttl time.Duration) *Bucket {
+func NewBucket(limit int, interval, ttl time.Duration) *Bucket {
 	return &Bucket{
-		prefix:   prefix,
 		limit:    limit,
 		interval: interval,
 		ttl:      ttl,

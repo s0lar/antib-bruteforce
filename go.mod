@@ -3,8 +3,8 @@ module github.com/s0lar/antib-bruteforce
 go 1.18
 
 require (
+	github.com/caarlos0/env/v6 v6.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/yl2chen/cidranger v1.0.2
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 )

@@ -58,27 +58,15 @@ func (n *NetList) Find(ip string) bool {
 	return false
 }
 
-// func (l *NetList) LookUpIP(ip string) (bool, error) {
-//	IP := net.ParseIP(ip)
-//	l.mx.RLock()
-//	defer l.mx.RUnlock()
-//	contains, err := l.ranger.Contains(IP)
-//	if err != nil {
-//		return false, err
-//	}
-//	return contains, nil
-//}
-//
-// func (l *NetList) DeleteCIDR(cidr string) error {
-//	_, net, err := net.ParseCIDR(cidr)
-//	if err != nil {
-//		return err
-//	}
-//	l.mx.Lock()
-//	defer l.mx.Unlock()
-//	_, err = l.ranger.Remove(*net)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
+//	Find - trying to find IP in list
+func (n *NetList) Remove(cidr string) error {
+	if _, _, err := net.ParseCIDR(cidr); err != nil {
+		return err
+	}
+
+	n.mx.Lock()
+	defer n.mx.Unlock()
+
+	delete(n.list, cidr)
+	return nil
+}

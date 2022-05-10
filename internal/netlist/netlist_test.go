@@ -23,6 +23,10 @@ var tests = []struct {
 		false,
 	},
 	{
+		"192.17.0.0",
+		true,
+	},
+	{
 		"asd",
 		true,
 	},
@@ -92,4 +96,24 @@ func TestNetList_Load(t *testing.T) {
 
 	err = tlist.Load([]string{"asdasd"})
 	require.Error(t, err)
+}
+
+func TestNetList_Remove(t *testing.T) {
+	list := NewNetList()
+
+	//	Add some CIDR's before removing
+	for _, tt := range tests {
+		t.Run(tt.cidr, func(t *testing.T) {
+			list.Add(tt.cidr)
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.cidr, func(t *testing.T) {
+			err := list.Remove(tt.cidr)
+			if err != nil {
+				require.True(t, tt.isErr)
+			}
+		})
+	}
 }
