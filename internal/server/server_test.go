@@ -282,7 +282,7 @@ func TestServer_RemoveBlacklist(t *testing.T) {
 }
 
 func prepareCtxServer() (context.Context, *Server) {
-	var ctx context.Context
+	ctx := context.Background()
 	server := NewServer(
 		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),
 		bucket.NewBucket(10, 1*time.Minute, 2*time.Minute),

@@ -12,17 +12,17 @@ type Config struct {
 		Login      struct {
 			Limit    int           `env:"LOGIN_LIMIT" envDefault:"10"`
 			Interval time.Duration `env:"LOGIN_INTERVAL" envDefault:"1m0s"`
-			Ttl      time.Duration `env:"LOGIN_TTL" envDefault:"2m0s"`
+			TTL      time.Duration `env:"LOGIN_TTL" envDefault:"2m0s"`
 		}
 		Password struct {
 			Limit    int           `env:"PASSWORD_LIMIT" envDefault:"100"`
 			Interval time.Duration `env:"PASSWORD_INTERVAL" envDefault:"1m0s"`
-			Ttl      time.Duration `env:"PASSWORD_TTL" envDefault:"2m0s"`
+			TTL      time.Duration `env:"PASSWORD_TTL" envDefault:"2m0s"`
 		}
 		IP struct {
 			Limit    int           `env:"IP_LIMIT" envDefault:"1000"`
 			Interval time.Duration `env:"IP_INTERVAL" envDefault:"1m0s"`
-			Ttl      time.Duration `env:"IP_TTL" envDefault:"2m0s"`
+			TTL      time.Duration `env:"IP_TTL" envDefault:"2m0s"`
 		}
 	}
 	DB struct {

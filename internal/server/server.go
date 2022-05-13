@@ -24,7 +24,6 @@ type Server struct {
 	bucketIP       *bucket.Bucket
 	listWhite      *netlist.NetList
 	listBlack      *netlist.NetList
-	logger         log.Logger
 }
 
 func NewServer(bucketLogin, bucketPassword, bucketIP *bucket.Bucket, listWhite, listBlack *netlist.NetList) *Server {
@@ -159,8 +158,4 @@ func (s *Server) RemoveBlacklist(ctx context.Context, req *pb.NetListRequest) (*
 	}
 
 	return &pb.NetListResponse{Ok: true}, nil
-}
-
-func (s *Server) mustEmbedUnimplementedCheckerServer() {
-	panic("implement me")
 }
