@@ -1,6 +1,10 @@
 package main
 
 import (
+	"database/sql"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
 	"log"
 	"net"
 
@@ -17,8 +21,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Config loaded")
 
 	//	TODO DB
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.DB.Dsn)))
+	db := bun.NewDB(sqldb, pgdialect.New())
+	log.Println("Database connected")
+	log.Println(db)
+
 	//	TODO CLI
 	//	TODO Docker && Make
 
@@ -39,9 +49,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	srv := server.NewServer(
-		bucket.NewBucket(cfg.App.Login.limit, cfg.App.Login.interval, cfg.App.Login.ttl),          //	Login
-		bucket.NewBucket(cfg.App.Password.limit, cfg.App.Password.interval, cfg.App.Password.ttl), //	Password
-		bucket.NewBucket(cfg.App.IP.limit, cfg.App.IP.interval, cfg.App.IP.ttl),                   //	IP
+		bucket.NewBucket(cfg.App.Login.Limit, cfg.App.Login.Interval, cfg.App.Login.Ttl),          //	Login
+		bucket.NewBucket(cfg.App.Password.Limit, cfg.App.Password.Interval, cfg.App.Password.Ttl), //	Password
+		bucket.NewBucket(cfg.App.IP.Limit, cfg.App.IP.Interval, cfg.App.IP.Ttl),                   //	IP
 		listWhite,
 		listBlack,
 	)
