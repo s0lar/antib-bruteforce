@@ -32,9 +32,9 @@ func NewBucket(limit int, interval, ttl time.Duration) *Bucket {
 
 func (b *Bucket) Allow(key string) bool {
 	b.mx.Lock()
+	defer b.mx.Unlock()
 	currentTime := time.Now()
 	counter, ok := b.list[key]
-	defer b.mx.Unlock()
 
 	//	New key for checking
 	if !ok {
@@ -68,9 +68,9 @@ func (b *Bucket) Allow(key string) bool {
 //	Reset Counter in Bucket
 func (b *Bucket) Reset(key string) {
 	b.mx.Lock()
+	defer b.mx.Unlock()
 	currentTime := time.Now()
 	counter, ok := b.list[key]
-	defer b.mx.Unlock()
 
 	//	New key for checking
 	if !ok {
@@ -91,8 +91,8 @@ func (b *Bucket) Reset(key string) {
 // BucketGC - garbage collector for Bucket. Delete items from list if last update of counter more that TTL.
 func (b *Bucket) BucketGC() {
 	b.mx.Lock()
-	currentTime := time.Now()
 	defer b.mx.Unlock()
+	currentTime := time.Now()
 
 	for key, counter := range b.list {
 		if currentTime.Sub(counter.updated) > b.ttl {
