@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-	//	TODO Config
 	cfg, err := NewConfig()
 	if err != nil {
 		log.Fatal(err)

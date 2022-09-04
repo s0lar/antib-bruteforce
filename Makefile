@@ -14,12 +14,12 @@ test-coverage: ## Run tests with coverage
 	go test -p 1 -v -race -coverprofile cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 
-.PHONY: test-docker-up
-test-docker-up: ## Run test containers
+.PHONY: docker-up
+docker-up: ## Run test containers
 	docker-compose up -d
 
-.PHONY: test-docker-down
-test-docker-down: ## Stop test containers
+.PHONY: docker-down
+docker-down: ## Stop test containers
 	docker-compose down
 
 .PHONY: lint
@@ -44,6 +44,7 @@ build-server:  ## Build server
 
 .PHONY: run
 run:  ## Run server
+	docker-compose up -d
 	$(GO_BUILD) -o ./bin/server ./cmd/server && ./bin/server
 
 .PHONY: help
