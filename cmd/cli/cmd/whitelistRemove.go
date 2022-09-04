@@ -1,18 +1,14 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"context"
-	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"log"
 
+	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/spf13/cobra"
 )
 
-// whitelistRemoveCmd represents the whitelistRemove command
+// whitelistRemoveCmd represents the whitelistRemove command.
 var whitelistRemoveCmd = &cobra.Command{
 	Use:   "whitelistRemove",
 	Short: "Remove ip net from white list",

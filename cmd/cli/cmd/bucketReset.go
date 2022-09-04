@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"context"
+	"log"
+
 	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/spf13/cobra"
-	"log"
 )
 
-// bucketResetCmd represents the bucketReset command
+// bucketResetCmd represents the bucketReset command.
 var bucketResetCmd = &cobra.Command{
 	Use:   "bucketReset",
 	Short: "Reset buckets",

@@ -1,18 +1,14 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"context"
-	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"log"
 
+	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/spf13/cobra"
 )
 
-// whitelistAddCmd represents the whitelistAdd command
+// whitelistAddCmd represents the whitelistAdd command.
 var whitelistAddCmd = &cobra.Command{
 	Use:   "whitelistAdd",
 	Short: "Add ip net into white list",

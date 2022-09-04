@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"context"
-	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"log"
 
+	pb "github.com/s0lar/antib-bruteforce/gen/antibruteforce"
 	"github.com/spf13/cobra"
 )
 
-// blacklistAddCmd represents the blacklistAdd command
+// blacklistAddCmd represents the blacklistAdd command.
 var blacklistAddCmd = &cobra.Command{
 	Use:   "blacklistAdd",
 	Short: "Add ip net into black list",
