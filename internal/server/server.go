@@ -115,6 +115,7 @@ func (s *Server) AddWhitelist(ctx context.Context, req *pb.NetListRequest) (*pb.
 		return &pb.NetListResponse{Ok: false}, err
 	}
 
+	log.Printf("Ok: true. AddWhitelist success: %v", req.String())
 	return &pb.NetListResponse{Ok: true}, nil
 }
 
@@ -129,6 +130,7 @@ func (s *Server) RemoveWhitelist(ctx context.Context, req *pb.NetListRequest) (*
 		return &pb.NetListResponse{Ok: false}, err
 	}
 
+	log.Printf("Ok: true. RemoveWhitelist success: %v", req.String())
 	return &pb.NetListResponse{Ok: true}, nil
 }
 
@@ -143,6 +145,7 @@ func (s *Server) AddBlacklist(ctx context.Context, req *pb.NetListRequest) (*pb.
 		return &pb.NetListResponse{Ok: false}, err
 	}
 
+	log.Printf("Ok: true. AddBlacklist success: %v", req.String())
 	return &pb.NetListResponse{Ok: true}, nil
 }
 
@@ -157,5 +160,6 @@ func (s *Server) RemoveBlacklist(ctx context.Context, req *pb.NetListRequest) (*
 		return &pb.NetListResponse{Ok: false}, err
 	}
 
+	log.Printf("Ok: true. RemoveBlacklist success: %v", req.String())
 	return &pb.NetListResponse{Ok: true}, nil
 }

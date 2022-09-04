@@ -24,16 +24,22 @@ test-docker-down: ## Stop test containers
 
 .PHONY: lint
 lint: ## Run linter
-	revive ./...
+	CGO_ENABLED=0 golangci-lint run
 
 .PHONY: protoc
 protoc: ## Generate protoc
 	mkdir -p ./gen
 	protoc --proto_path=. --go_out=./gen --go-grpc_out=./gen ./proto/service.proto
 
+.PHONY: build
+build:  ## Build
+	$(GO_BUILD) -o ./bin/server ./cmd/server
+	$(GO_BUILD) -o ./bin/cli ./cmd/cli
+
 .PHONY: build-server
 build-server:  ## Build server
 	$(GO_BUILD) -o ./bin/server ./cmd/server
+	$(GO_BUILD) -o ./bin/cli ./cmd/cli
 	./bin/server
 
 .PHONY: run
